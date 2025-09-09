@@ -1,0 +1,35 @@
+Day 1: Creating a User with a Non-Interactive Shell
+
+What is a Non-Interactive Shell?
+A non-interactive shell is a shell that does not allow the user to log in and interact directly with the system. It is often used as a security measure for accounts that are meant to run background tasks or automated processes, but not for humans to log in.
+
+Terraform AWS User with no console access, can run automation but no one can log in to the console with the credentials
+Database Service Account for scheduled backups — can run backup jobs, but no one can SSH into it.
+
+Steps Taken
+1️. Connected to App Server 1 via SSH
+
+ssh username@hostname
+# Entered the server password when prompted
+Press enter or click to view image in full size
+
+2. Created the User with a Non-Interactive Shell
+
+sudo useradd -s /sbin/nologin anita
+-s /sbin/nologindisables shell access making it non-interactive.
+3. Verified the User
+
+getent passwd anita
+Output:
+
+Got the output in the image below showing user has been created.
+Press enter or click to view image in full size
+
+This confirms that:
+
+User anita exists
+The shell is /sbin/nologin (non-interactive)
+Key Takeaways
+Non-interactive shells help secure service or automation accounts
+Always verify user creation with getent passwd <username>
+This setup is common for automation, backups, and application service accounts
