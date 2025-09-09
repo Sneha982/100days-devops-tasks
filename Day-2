@@ -1,0 +1,42 @@
+Creating a User with an Expiry Date:
+
+Create a user named kareem on App Server 2 in Stratos Datacenter. Set the expiry date to 2024-03-28, ensuring the user is created in lowercase as per standard protocol.
+
+Note: You can find the infrastructure details by clicking on the Details of all Users and Servers button on the top-right section of the page.
+
+
+Why Set a User Expiry Date?
+An account expiry date is a security control that automatically disables a user after a specific date.
+This is useful for:
+
+Temporary staff or contractors
+Project-based accounts
+Accounts created for audits, testing, or training
+It saves you from having to remember to manually disable accounts, and it reduces the risk of unused accounts being exploited. A perfect use case is giving a contract developer SSH access only until the project deadline — once the expiry date passes, the account is locked automatically.
+
+Sol:
+The steps i have followed,
+1. Connected to App Server 2 via SSH
+ssh username@IP_or_hostname
+# Entered the password when prompted
+
+2. Created the User with an Expiry Date
+sudo useradd -e 2024-04-15 -m kareem
+-e sets the expiry date
+-m → creates a home directory (e.g., /home/kareem) so the user has a place to store files and configurations
+3. Set a Password for the User
+sudo passwd kareem
+Entered and confirmed the password for the account.
+Press enter or click to view image in full size
+
+4. Verified the Expiry Date
+sudo chage -l kareem
+Output snippet:
+
+Account expires    : Mar 28, 2024
+This confirms the expiry date is set correctly.
+
+Key Takeaways
+-e in useradd sets an account expiry date
+Expiry dates are essential for temporary account security
+Verify account expiration with chage -l <username>
