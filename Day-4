@@ -1,0 +1,51 @@
+**Script Execution Permissions to all users***
+
+On App Server 3 within the Stratos Datacenter:
+
+Grant execute permissions to the /tmp/xfusioncorp.sh script
+Ensure all users can execute it
+In Linux, a file won’t run as a program unless it has execute permissions (x) even if it contains valid commands or code. In team environments, shared scripts (like backup jobs) are often stored in shared directories. Making them readable + executable for all users ensures automation tools, cron jobs, and team members can run them without hitting permission errors.
+
+Steps taken to carry out the task
+1. Connected to App Server 3 via SSH
+
+ssh username@hostname
+# Entered the password when prompted
+2. Checked the Current Permissions
+
+ls -l /tmp/xfusioncorp.sh
+Output:
+
+Press enter or click to view image in full size
+
+This shows that the script does not have any permissions at the moment. scripts need read (r) and execute (x) permission to be executable. Without r, the shell can’t read the commands inside the file to run them.
+
+3. Granted Execute Permissions to All Users
+
+sudo chmod a+rx /tmp/xfusioncorp.sh
+a means all users (owner, group, others)
++rx → add read and execute permission
+4️. Verified the Change
+
+ls -l /tmp/xfusioncorp.sh
+Output:
+
+Press enter or click to view image in full size
+
+Now x appears for owner, group, and others, meaning all can execute the script.
+
+Quick permission guide:
+In -r-xr-x--x:
+First char → file type (- = file, d = directory)
+Next 3 → owner perms (r-x = read + execute)
+Next 3 → group perms (r-x = read + execute)
+Last 3 → others perms (--x = execute only)
+
+r = read, w = write, x = execute, - = no permission.
+5. Tested Execution to confirm the script runs without permission errors
+
+
+Key Takeaways
+Scripts need execute permission (x) to run
+chmod a+x is a quick way to grant execute rights to everyone
+Verify with ls -l after changing permissions
