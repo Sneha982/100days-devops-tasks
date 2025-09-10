@@ -1,2 +1,65 @@
 Secure Root SSH Access
 
+Why Disable Direct Root Login?
+On Linux systems, the root account has unrestricted privileges. If an attacker gains access to it, they can control everything.
+
+Allowing root to log in directly over SSH is risky because:
+
+It’s a well-known username, attackers don’t have to guess it
+Brute-force attacks become easier
+There’s no way to track individual user actions if everyone uses root
+The best practice is to:
+
+Have users log in with their own accounts
+Grant them administrative privileges via sudo when needed
+Example: On cloud servers (like AWS EC2), providers disable root SSH login by default — you log in as ec2-user, ubuntu, or similar, then use sudo for admin tasks.
+
+Steps Taken
+1. Connected to Each App Server via SSH
+
+ssh username@server_ip
+The task required repeating the process for all three app servers.
+
+2. Edited the SSH Configuration File
+
+Opened the sshd_config file:
+
+sudo vi /etc/ssh/sshd_config
+Pressed i to enter insert mode, then found the line:
+
+PermitRootLogin yes
+Changed it to
+
+PermitRootLogin no
+Changing it to no disables root login via SSH.
+
+Press enter or click to view image in full size
+
+3. Saved and Closed the File
+
+Pressed Esc → typed :wq → hit Enter.
+
+4. Restarted the SSH Service
+
+sudo systemctl restart sshd
+5. Verified the Setting
+
+Instead of trying to log in as root (since I didn’t have the root password), I checked with:
+
+sudo sshd -T | grep permitrootlogin
+Output:
+
+permitrootlogin no
+Press enter or click to view image in full size
+
+Confirmed the setting had taken effect.
+
+6. Repeated for All App Servers
+
+I followed the same steps on the remaining two servers.
+
+Key Takeaways
+Disabling root SSH login is a fundamental server hardening step.
+Always verify changes with sshd -T or by testing login.
+Use sudo privileges for admin work instead of direct root access.
+
