@@ -1,0 +1,54 @@
+SElinux Installation and Configuration
+
+On App Server 2 within the Stratos Datacenter:
+
+Install the required SELinux packages
+Permanently disable SELinux (for now)
+No reboot needed immediately; it will be disabled after the planned maintenance reboot tonight
+
+What is SELinux?
+SELinux (Security-Enhanced Linux) is a security module built into the Linux kernel that enforces Mandatory Access Control (MAC).
+Instead of relying only on standard Linux permissions (owner, group, others), SELinux uses policies to decide which processes can access which files, sockets, and other system resourceseven if standard permissions would normally allow it.
+
+This adds a second layer of defense against misconfigurations or exploited services.
+
+Steps Taken to Carry Out the Task
+1. Checked the OS Version
+I confirmed the server’s operating system to determine which package manager to use.
+
+cat /etc/*release
+Press enter or click to view image in full size
+
+2. Installed the Required SELinux Packages using yum
+The OS showed CentOS, so I used yum for installing packages. I sucessfully installed the packages
+
+sudo yum install selinux-policy selinux-policy-targeted policycoreutils
+selinux-policy → The base rule set for SELinux
+selinux-policy-targeted → Default policy that targets high-risk services
+policycoreutils → Command-line tools to manage SELinux
+Press enter or click to view image in full size
+
+️3. Permanently Disabled SELinux
+Opened the SELinux configuration file:
+sudo vi /etc/selinux/config
+
+#Once the file was opened, Changed
+SELINUX=enforcing
+
+#to 
+
+SELINUX=disabled
+Press enter or click to view image in full size
+
+Saved and exited the file in vi using (:wq).
+4️. Verified the Config Change
+grep SELINUX= /etc/selinux/config
+Output:
+
+Press enter or click to view image in full size
+
+This confirms that after the next reboot, SELinux will be disabled.
+
+Key Takeaways
+SELinux adds a policy-based security layer that works alongside traditional Linux permissions
+Permanent changes to SELinux state require editing /etc/selinux/config
