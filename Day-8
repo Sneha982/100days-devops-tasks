@@ -1,0 +1,56 @@
+ Install Ansible
+
+Install Ansible v4.8.0 on the jump host using pip3 and make sure it’s available for all users.
+
+What is Ansible & What Does It Do?
+Ansible is an open-source automation tool used for:
+
+What is Ansible?
+Ansible is an open-source automation tool for:
+
+Configuration management: set up servers the same way every time.
+Application deployment: install and update software easily.
+Task automation: run commands on many servers at once.
+Orchestration: coordinate multiple machines and services in complex setups.
+It uses playbooks (written in YAML) to define what needs to be done.
+
+It’s agentless which means no extra software needed on the target machines, just SSH access.
+
+It’s popular because it’s simple, readable, and works on many systems.
+
+Task Solution:
+Checked OS and pip3 availability on Jumphost
+cat /etc/*release # to check OS
+python3 --version #Check if Python 3 is installed
+pip3 --version # to check if pip3 is installed
+Ansible runs on Python, so the first step is to make sure Python 3 is available.
+pip3 is Python’s package manager — without it, we can’t install Ansible from PyPI.
+Output:
+
+Press enter or click to view image in full size
+
+2. Installed Ansible v4.8.0
+
+Specified the version to lock it in case there is a newer version than the one specified in the task.
+
+sudo pip3 install ansible==4.8.0\
+Output:
+
+Press enter or click to view image in full size
+
+3. After installation was complete, verified installation
+
+ansible --version
+When I checked my Ansible version with ansible --version, I didn’t see “4.8.0”, instead, I saw “core 2.11.12.” . This is because Ansible’s version command shows the core engine version, not the full package version. To check the full release, I had to run pip3 show ansible.
+
+Output:
+
+Press enter or click to view image in full size
+
+4. Ensured Ansible was available to global users.
+
+Since Ansible was installed with sudo pip3, It should be in /usr/local/bin and available to all users.
+I checked with the command which ansible to confirm
+Press enter or click to view image in full size
+
+It’s in a directory (/usr/local/bin) that’s part of the global $PATH, so any user on the jump host can run ansible without extra setup.
