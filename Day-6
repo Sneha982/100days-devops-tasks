@@ -1,0 +1,68 @@
+Create a Cron Job
+
+On all Nautilus app servers:
+
+Install cronie package and start the crond service.
+Create a cron job for the root user to run every 5 minutes: echo hello > /tmp/cron_text
+Cron jobs are a simple but powerful way to automate repetitive tasks — from running backups to sending alerts. This test job writes “hello” to a file every 5 minutes, helping validate that the scheduling works before deploying production scripts.
+
+Steps taken to carry out the task
+1️. Checked OS type
+
+Connected to each app server via SSH as the assigned user
+Confirmed the Linux distribution since package managers differ between Linux distributions:
+cat /etc/os-release
+2. Installed Cron package
+
+Installedcronie (cron utility package).
+Used yumfor the CentOS distribution (apt is used for debian and ubuntu.)
+sudo yum install cronie -y
+3. Started and enabled the crond service
+
+sudo systemctl start crond
+sudo systemctl enable crond
+sudo systemctl status crond
+Output:
+
+active (running) confirms it’s working.
+
+Press enter or click to view image in full size
+
+4. Edited root’s crontab
+
+Opened the crontab editor:
+
+sudo crontab -e
+Added this line to root’s crontab to run the job every 5 minutes
+
+*/5 * * * * echo hello > /tmp/cron_text
+Breakdown:
+
+*/5 → run every 5 minutes.
+* * * → no restrictions on hour, day, month, or day of week.
+echo hello → command that outputs the text "hello".
+> /tmp/cron_text → writes that output to the file /tmp/cron_text, overwriting it each time.
+This means that every 5 minutes, the cron job replaces the contents of /tmp/cron_text with the word hello.
+
+5. Saved and verified the cron job
+
+Saved and exited the crontab editor.
+Verified the cron job is scheduled:
+sudo crontab -l
+Output showed the scheduled task:
+
+Press enter or click to view image in full size
+
+6. Waited for the cron job to run
+
+Waited for a little over 5 minutes then ran:
+
+cat /tmp/cron_text
+Output: hello
+
+This confirmed success.
+
+Key Takeaways
+Cron is essential for Linux automation.
+Verify the cron service is running.
+Use test jobs before deploying critical scheduled tasks.
