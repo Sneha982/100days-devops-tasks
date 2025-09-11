@@ -1,0 +1,64 @@
+Linux SSH Authentication
+
+Set up password-less authentication from thor on the jump host to all app servers via their respective sudo users.
+
+What is password-less SSH?
+Password-less SSH uses public/private key pairs instead of typing a password every time you connect to a server. I
+
+Enables automation (scripts, cron jobs) without manual password entry
+Improves security, as private keys are harder to brute-force than passwords
+Helps with consistency when managing multiple servers
+Steps taken to carry out the task
+1️. I made sure I was connected to the jump host ‘thor’
+
+
+2️. Generated SSH key pair for thor
+
+ssh-keygen -t rsa
+Pressed Enter to accept default file location (~/.ssh/id_rsa).
+Left the passphrase empty to allow full automation.
+Press enter or click to view image in full size
+
+The keys were saved to
+~/.ssh/id_rsa    # Private key (keep safe)
+~/.ssh/id_rsa.pub  # Public key
+Press enter or click to view image in full size
+
+3️. Copied the public key to each app server’s sudo user
+
+For App Server 1 (tony):
+
+#For App Server 1 (tony):
+ssh-copy-id tony@<app_server1_ip>
+
+#For App Server 2 (steve):
+ssh-copy-id steve@<app_server2_ip>
+
+#For App Server 3 (banner):
+ssh-copy-id banner@<app_server3_ip>
+💡 Note: Entered each user’s password once during this step. After that, no password was needed
+
+4. Tested password-less login to each app server
+
+ssh tony@<app_server1_ip>
+ssh steve@<app_server2_ip>
+ssh banner@<app_server3_ip>
+Each connection succeeded without prompting for a password.
+
+Press enter or click to view image in full size
+
+5. As best practice, protected my private key with:
+
+chmod 600 ~/.ssh/id_rsa
+chmod (short for change mode) is a Linux command used to change a file’s permissions.
+
+6 Owner can read (4) + write (2) = 6
+0 →Group has no permissions
+0 Others have no permissions
+This ensures only the owner can read the key. Without this, other users on the same system could copy the key and gain access.
+
+Key Takeaways
+
+SSH key-based authentication improves automation and security.
+ssh-copy-id is the fastest way to configure the authentication
+Always secure your private key with chmod 600 in real-world setups.
