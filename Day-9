@@ -1,0 +1,74 @@
+Day-9
+Scenario:
+A critical issue hit the Nautilus application in Stratos DC, connection to the database failed. After investigation, the production support team found that the mariadb service was down on the database server.
+
+My task: investigate and bring the service back up.
+
+What is MariaDB?
+
+MariaDB is an open-source relational database management system (RDBMS) and a drop-in replacement for MySQL. It’s widely used for storing and managing structured data, supporting SQL queries, transactions, replication, and high availability setups. Many applications, including the Nautilus app here, depend on it for core functionality.
+
+Solution:
+
+Connected to the dbserver via SSH:
+ssh username@dbserver_ip
+2. Confirmed the status of the MariaDB service
+
+sudo systemctl status mariadb
+Output: service was inactive (dead).
+
+Press enter or click to view image in full size
+
+3. Since the service was inactive, I restarted it
+
+sudo systemctl start mariadb
+Output: I got an error:
+
+Press enter or click to view image in full size
+
+4. I checked the logs to see why the service failed
+
+sudo systemctl status mariadb --no-pager -l
+sudo journalctl -xeu mariadb --no-pager
+Output showed that: MariaDB sees leftover files in /var/lib/mysql but no proper initialized database. This could have occured due to a partial or failed installation ofthe service.
+
+Press enter or click to view image in full size
+
+5. I stopped the service:
+
+sudo systemctl stop mariadb
+6. Tried to back up the existing /var/lib/mysql directory
+
+This is so as not to lose anything that might be needed later. I then found out that the directory did not exist at all. MariaDB had nowhere to store data, so it refuses to start. This was the exact cause of the issue
+
+7. Created the directory with the correct ownership
+
+sudo mkdir /var/lib/mysql
+sudo chown mysql:mysql /var/lib/mysql
+sudo chmod 750 /var/lib/mysql
+8. Initialized the MariaDB data directory
+
+sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+Output: Tables were built successfully
+
+Press enter or click to view image in full size
+
+9. Started MariaDB and checked the status to be sure it was running
+
+sudo systemctl start mariadb 
+sudo systemctl status mariadb
+Output: Active (running
+Press enter or click to view image in full size
+
+10. Enabled service at boot to prevent downtime when the system reboots.
+
+sudo systemctl enable mariadb
+11. Checked to see if the application could now connect to the database:
+
+sudo mysql -u root -p
+Output: The application could now connect to MariaDB
+
+Press enter or click to view image in full size
+
+Learning Note:
+MariaDB wouldn’t start simply because its data directory didn’t exist. The fix wasn’t just starting the service. It was creating the right directory, assigning correct permissions, and initializing system tables. The most critical part of troubleshooting is reading the logs carefully and acting on exactly what they say.
