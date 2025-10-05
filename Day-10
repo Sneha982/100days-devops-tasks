@@ -1,0 +1,39 @@
+Day 10: Linux Bash Scripts
+The support team needs a script to back up a static website.
+Create news_backup.sh to archive /var/www/html/news, store it in /backup/, and copy it to the backup server.
+
+Details:
+
+App Server 2 → stapp02
+IP: 172.16.238.11
+Hostname: stapp02.stratos.xfusioncorp.com
+SSH User: steve
+Backup Server→ stbkp01
+IP: 172.16.238.16
+Hostname: stbkp01.stratos.xfusioncorp.com
+SSH User: clint
+Solution:
+
+ssh steve@stapp02
+sudo yum install -y zip
+sudo mkdir -p /scripts
+sudo vi /scripts/news_backup.sh
+Script content:
+
+#!/bin/bash
+zip -r /backup/xfusioncorp_news.zip /var/www/html/news
+scp /backup/xfusioncorp_news.zip clint@stbkp01:/backup
+Make it executable:
+
+sudo chmod +x /scripts/news_backup.sh
+ssh-keygen
+ssh-copy-id clint@stbkp01
+/scripts/news_backup.sh
+Verify:
+
+ssh clint@stbkp01
+ls -la /backup/
+Result:
+
+-rw-r--r-- 1 clint clint 588 Aug 19 18:06 xfusioncorp_news.zip
+The backup archive is successfully created and copied to the backup server.
