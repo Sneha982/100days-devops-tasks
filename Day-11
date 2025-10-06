@@ -1,0 +1,72 @@
+Day 11: Install and Configure Tomcat Server
+The Nautilus application development team recently finished the beta version of one of their Java-based applications, which they are planning to deploy on one of the app servers in Stratos DC. After an internal team meeting, they have decided to use the tomcat application server. Based on the requirements mentioned below complete the task:
+
+a. Install tomcat server on App Server 3.
+b. Configure it to run on port 5001.
+c. There is a ROOT.war file on Jump host at location /tmp.
+Deploy it on this tomcat server and make sure the webpage works directly on base URL i.e curl http://stapp03:5001
+
+Details:
+
+App Server 3 → stapp03
+IP: 172.16.238.12
+Hostname: stapp03.stratos.xfusioncorp.com
+SSH User: banner
+Solution:
+
+Copy the ROOT.war file from the jump host to the target server:
+
+scp /tmp/ROOT.war banner@stapp03:/tmp
+SSH into the App Server 3 and gain root privileges:
+
+ssh banner@stapp03
+sudo -i
+Install Tomcat and configure the service port to 5001:
+
+yum install -y tomcat
+vi /usr/share/tomcat/conf/server.xml  # Update 8080 to 5001
+Deploy the ROOT.war file:
+
+cp /tmp/ROOT.war /usr/share/tomcat/webapps/
+ls -la /usr/share/tomcat/webapps/
+Start and enable the Tomcat service:
+
+systemctl start tomcat
+systemctl enable tomcat
+This ensures that the Tomcat server runs on boot and the application is deployed properly.
+
+Verify:
+Run the following command from any host that can access stapp03:
+
+curl -i http://stapp03:5001
+This checks that the web application is accessible and responds with HTTP 200.
+
+Result:
+
+HTTP/1.1 200 
+Accept-Ranges: bytes
+ETag: W/"471-1580289830000"
+Last-Modified: Wed, 29 Jan 2020 09:23:50 GMT
+Content-Type: text/html
+Content-Length: 471
+Date: Wed, 20 Aug 2025 18:33:07 GMT
+
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>SampleWebApp</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h2>Welcome to xFusionCorp Industries!</h2>
+        <br>
+    
+    </body>
+</html>
+The Tomcat server is running successfully, and the ROOT application is accessible at the base URL.
