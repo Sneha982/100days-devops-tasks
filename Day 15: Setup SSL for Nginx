@@ -1,0 +1,92 @@
+Day 15: Setup SSL for Nginx
+The system admins team of xFusionCorp Industries needs to deploy a new application on App Server 1 in Stratos Datacenter. They have some prerequisites to get the server ready for application deployment. Prepare the server as per the requirements shared below:
+
+Install and configure Nginx on App Server 1.
+On App Server 1 there is a self-signed SSL certificate and key present at /tmp/nautilus.crt and /tmp/nautilus.key. Move them to an appropriate location and deploy them in Nginx.
+Create an index.html file with content Welcome! under Nginx document root.
+For final testing, try to access the App Server 1 link (either hostname or IP) from the jump host using curl -Ik https://<app-server-ip>/.
+Details:
+
+App Server 1 → stapp01
+IP: 172.16.238.12
+Hostname: stapp01.stratos.xfusioncorp.com
+SSH User: banner
+Solution:
+
+SSH into the server and gain root privileges:
+
+ssh banner@stapp01
+sudo -i
+Install Nginx:
+
+yum install epel-release -y
+yum install nginx -y
+Create SSL directory and move certificates:
+
+mkdir -p /etc/nginx/ssl
+mv /tmp/nautilus.crt /etc/nginx/ssl/
+mv /tmp/nautilus.key /etc/nginx/ssl/
+chmod 600 /etc/nginx/ssl/nautilus.key
+chmod 644 /etc/nginx/ssl/nautilus.crt
+Configure Nginx with SSL and HTTP-to-HTTPS redirect:
+
+vi /etc/nginx/nginx.conf
+
+
+    # SSL-enabled server
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name 172.16.238.12;
+
+        ssl_certificate     /etc/nginx/ssl/nautilus.crt;
+        ssl_certificate_key /etc/nginx/ssl/nautilus.key;
+
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        error_page 404 /404.html;
+        location = /404.html {}
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {}
+    }
+
+    # Redirect HTTP to HTTPS
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name 172.16.238.12;
+        return 301 https://$host$request_uri;
+    }
+Create a simple index file:
+
+echo "Welcome!" | tee /usr/share/nginx/html/index.html
+Start and enable Nginx:
+
+systemctl start nginx
+systemctl enable nginx
+systemctl status nginx
+Verify:
+
+nginx -t
+curl -Ik https://172.16.238.12/
+Check that the Nginx configuration is valid and the HTTPS site responds with HTTP 200.
+
+Result:
+
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+HTTP/1.1 200 OK
+Server: nginx/1.20.1
+Date: Sat, 30 Aug 2025 16:44:52 GMT
+Content-Type: text/html
+Content-Length: 9
+Last-Modified: Sat, 30 Aug 2025 16:42:24 GMT
+Connection: keep-alive
+ETag: "68b329f0-9"
+Accept-Ranges: bytes
+Nginx is configured with SSL successfully, and the Welcome! page is accessible via HTTPS.
