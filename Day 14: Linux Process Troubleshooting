@@ -1,0 +1,41 @@
+Day 14: Linux Process Troubleshooting
+The production support team of xFusionCorp Industries has deployed some of the latest monitoring tools to keep an eye on every service, application, etc., running on the systems. One of the monitoring systems reported Apache service unavailability on one of the app servers in Stratos DC.
+Identify the faulty app host and fix the issue. Make sure Apache service is up and running on all app hosts. They might not have hosted any code yet, so you don’t need to worry about serving pages. Just ensure Apache is running on port 6400 on all app servers.
+
+Details:
+
+App Server 1 → stapp01
+IP: 172.16.238.10
+Hostname: stapp01.stratos.xfusioncorp.com
+SSH User: tony
+Solution:
+
+Check connectivity to port 6400:
+
+telnet stapp01 6400    # connection refused
+telnet stapp02 6400    # connected
+telnet stapp03 6400    # connected
+SSH into stapp01 and check Apache service:
+
+ssh tony@stapp01
+sudo -i
+systemctl status httpd
+Kill any conflicting processes:
+
+netstat -tulnp | grep 6400
+kill <PID>
+systemctl start httpd
+Verify:
+
+telnet stapp01 6400
+The connection should now succeed.
+
+Result:
+
+Trying 172.16.238.10…
+
+Connected to stapp01.
+
+Escape character is '^]'.
+
+Apache service is running on port 6400 for all app servers, and connections succeed from the monitoring system and jump host.
