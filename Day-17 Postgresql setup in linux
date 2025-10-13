@@ -1,0 +1,49 @@
+Today’s task was all about PostgreSQL, one of the most widely used relational databases in production environments. The goal was to prepare the backend foundation for a newly developed application by configuring the database layer correctly without restarting the service!
+
+Press enter or click to view image in full size
+
+Task Overview
+
+I was given access to a database server where PostgreSQL was already installed. My mission was to:
+
+✅ Create a PostgreSQL user: kodekloud_joy
+
+✅ Set a secure password: YchZHRcLkL
+
+✅ Create a new database: kodekloud_db4
+
+✅ Grant full permissions on this database to the newly created user
+
+Note: Restarting the PostgreSQL service was strictly prohibited.
+
+Step-by-Step Implementation
+
+Here’s how I tackled the task using PostgreSQL’s built-in tools and Linux user switching.
+
+1️⃣ SSH into the Database Server
+ssh peter@stdb01
+Press enter or click to view image in full size
+
+Once connected, I switched to the postgres system user. PostgreSQL typically runs under this user:
+
+sudo su - postgres
+2️⃣ Access the PostgreSQL Interactive Shell
+psql
+This gave me access to the PostgreSQL command interface where I could safely run SQL statements.
+
+3️⃣ Create the User
+I created the user and assigned the password:
+
+CREATE USER kodekloud_joy WITH PASSWORD 'YchZHRcLkL';
+4️⃣ Create the Database
+CREATE DATABASE kodekloud_db4;
+5️⃣ Grant Privileges
+I granted full access to the user on the newly created database:
+
+GRANT ALL PRIVILEGES ON DATABASE kodekloud_db4 TO kodekloud_joy;
+6️⃣ Exit PostgreSQL and Postgres User
+exit
+And just like that, the database environment was fully set up, without touching the service status or configuration files.
+
+Press enter or click to view image in full size
+
