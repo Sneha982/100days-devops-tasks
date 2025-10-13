@@ -1,0 +1,65 @@
+Day 19: Install and Configure Web Application
+xFusionCorp Industries is planning to host two static websites on their infra in Stratos Datacenter. The development of these websites is still in-progress, but we want to get the servers ready. Please perform the following steps to accomplish the task:
+
+a. Install httpd package and dependencies on app server 1.
+
+b. Apache should serve on port 6400.
+
+c. There are two website’s backups /home/thor/ecommerce and /home/thor/games on jump_host. Set them up on Apache in a way that ecommerce should work on the link http://localhost:6400/ecommerce/ and games should work on link http://localhost:6400/games/ on the mentioned app server.
+
+d. Once configured you should be able to access the website using curl command on the respective app server, i.e curl http://localhost:6400/ecommerce/ and curl http://localhost:6400/games/
+
+ANSWER
+
+Ssh into app server 1
+Update system to avoid package conflicts:
+sudo yum update -y
+Install Apache:
+sudo yum install httpd -y
+Configure Apache to Serve on Port 6400. Edit Apache config:
+sudo vi /etc/httpd/conf/httpd.conf
+Find Listen 80 and change to Listen 6400
+Save and exit
+Start/enable Apache:
+sudo systemctl start httpd 
+sudo systemctl enable httpd
+Next is to Transfer and Set Up Website Files. Transfer backups from jump host to App server 1.
+
+From jump host, Verify files are present:
+ls -l /home/thor/ecommerce /home/thor/games
+result should contain static files, e.g., index.html
+Use scp to copy to app server 1:
+scp -r /home/thor/ecommerce tony@172.16.238.10:/tmp/
+scp -r /home/thor/games tony@172.16.238.10:/tmp/
+From app server 1, Move files to Apache directories:
+sudo mkdir -p /var/www/html/ecommerce /var/www/html/games
+sudo mv /tmp/ecommerce/* /var/www/html/ecommerce/
+sudo mv /tmp/games/* /var/www/html/games/
+Set permissions:
+sudo chown -R apache:apache /var/www/html
+sudo chmod -R 755 /var/www/html
+Next is to Configure Apache for URL Mapping. From app server 1, Create or edit a config file:
+sudo vi /etc/httpd/conf.d/websites.conf
+And enter the below:
+Alias "/ecommerce" "/var/www/html/ecommerce"
+Alias "/games" "/var/www/html/games"
+<Directory "/var/www/html/ecommerce">
+Options Indexes FollowSymLinks
+AllowOverride All
+Require all granted
+</Directory>
+<Directory "/var/www/html/games">
+Options Indexes FollowSymLinks
+AllowOverride All
+Require all granted
+</Directory>
+Verify config:
+sudo apachectl configtest
+(should return “Syntax OK”).
+
+Restart Apache:
+sudo systemctl restart httpd
+Test Website Access:
+curl http://localhost:6400/ecommerce/
+curl http://localhost:6400/games/
+Each command returns the content of index.html (or equivalent) from /var/www/html/ecommerce/ or /var/www/html/games/
