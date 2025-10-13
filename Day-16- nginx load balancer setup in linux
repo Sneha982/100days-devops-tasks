@@ -1,0 +1,78 @@
+Task Overview
+Today’s challenge focused on optimizing performance for a high-traffic web application by deploying a Load Balancer using Nginx. The goal was to configure the LBR (Load Balancer) server to evenly distribute traffic across three application servers running Apache on a custom port.
+
+Press enter or click to view image in full size
+
+The Scenario
+
+The Nautilus production support team noticed performance degradation due to increasing traffic on one of their websites. The application had already been migrated to a high-availability stack on multiple app servers, and only the Load Balancer (LBR) configuration remained.
+
+My mission was to:
+
+✅ Install Nginx on the LBR server
+
+✅ Configure HTTP-based load balancing using all three app servers
+
+✅ Ensure Apache was running on each app server without modifying their port configuration
+
+✅ Modify only the /etc/nginx/nginx.conf file
+
+How I Solved It
+
+Here’s a breakdown of my approach:
+
+1. SSH into the LBR Host, Installed and Started Nginx
+sudo yum install -y nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+Press enter or click to view image in full size
+
+2. Confirmed the port which Apache was running on the App servers
+I SSH’ed into the app server and verified Apache status and its listening port, I discovered the listening port was “6400”:
+
+sudo systemctl status httpd
+sudo ss -tulnp | grep httpd
+Press enter or click to view image in full size
+
+3. From the LBR host, I Updated /etc/nginx/nginx.conf to Define Load Balancing
+Inside the http block, I added:
+
+upstream app_servers {
+server stapp01.stratos.xfusioncorp.com:6400;
+server stapp02.stratos.xfusioncorp.com:6400;
+server stapp03.stratos.xfusioncorp.com:6400;
+}
+server {
+listen 80;
+listen [::]:80;
+server_name _;
+location / {
+proxy_pass http://app_servers;
+}
+error_page 404 /404.html;
+location = /404.html {}
+error_page 500 502 503 504 /50x.html;
+location = /50x.html {}
+}
+4. Validated and Reloaded Nginx
+sudo nginx -t
+sudo systemctl reload nginx
+Result
+
+After configuring the setup, I tested it using the platform’s StaticApp button. The traffic was successfully being routed across all app servers, confirming that load balancing worked as expected!
+
+Press enter or click to view image in full size
+
+What I Learned
+
+How to define a basic round-robin load balancing setup in Nginx
+Importance of context in Nginx directives (e.g., where to place include or types)
+Troubleshooting Nginx config errors like “types directive is not allowed here”
+How to inspect active ports on remote servers using ss
+Tools & Skills Used
+
+Linux (CentOS Stream 9)
+Nginx Load Balancer
+Apache Web Server
+SSH & systemctl
+Bash & config troubleshooting
